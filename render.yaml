@@ -6,5 +6,5 @@ services:
     dockerfilePath: ./Dockerfile
     healthCheckPath: /
     envVars:
-      - key: sql306.infinityfree.com
+      - key: DATABASE_URL
         value: mysql://if0_37758081:tAt3eBvaNwVzFVJ@sql306.infinityfree.com:3306/if0_37758081_sistema_riego
