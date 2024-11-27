@@ -41,10 +41,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
-
 // Obtener todos los usuarios para mostrarlos
 $result = $conn->query("SELECT * FROM usuarios");
-$usuarios = $result->fetch_all(MYSQLI_ASSOC);
+
+// Inicializar el array para los usuarios
+$usuarios = [];
+while ($usuario = $result->fetch_assoc()) {
+    $usuarios[] = $usuario;
+}
 $result->close();
 ?>
 
