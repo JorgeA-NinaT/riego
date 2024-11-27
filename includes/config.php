@@ -32,4 +32,3 @@ if (isset($_POST['eliminar_lecturas']) && $_POST['eliminar_lecturas'] == 'true')
     }
 }
 ?>
-
