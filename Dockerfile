@@ -1,11 +1,23 @@
-# Usar una imagen base de PHP con Apache
+# Usa una imagen de PHP con soporte para Composer
 FROM php:8.1-apache
 
-# Copiar todos los archivos del proyecto al directorio raíz del servidor web
-COPY . /var/www/html/
+# Habilita las extensiones necesarias para PostgreSQL
+RUN apt-get update && apt-get install -y libpq-dev && docker-php-ext-install pdo pdo_pgsql
 
-# Dar permisos correctos al directorio
-RUN chown -R www-data:www-data /var/www/html
+# Establece el directorio de trabajo dentro del contenedor
+WORKDIR /var/www/html
 
-# Exponer el puerto 80
+# Copia los archivos del proyecto al contenedor
+COPY . /var/www/html
+
+# Instala Composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+# Instala las dependencias de PHP mediante Composer
+RUN composer install --no-dev --optimize-autoloader
+
+# Expone el puerto 80 para acceder a la aplicación
 EXPOSE 80
+
+# Configura el comando para iniciar Apache
+CMD ["apache2-foreground"]
