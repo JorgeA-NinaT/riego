@@ -15,10 +15,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $password = $_POST['contraseña'];
             $role = $_POST['rol'];
 
-            $stmt = $conn->prepare("INSERT INTO usuarios (nombre_usuario, contraseña, rol) VALUES (?, ?, ?)");
-            $stmt->bind_param("sss", $username, $password, $role);
+            $stmt = $conn->prepare("INSERT INTO usuarios (nombre_usuario, contraseña, rol) VALUES (:username, :password, :role)");
+            $stmt->bindValue(':username', $username, PDO::PARAM_STR);
+            $stmt->bindValue(':password', $password, PDO::PARAM_STR);
+            $stmt->bindValue(':role', $role, PDO::PARAM_STR);
             $stmt->execute();
-            $stmt->close();
         } elseif ($action === 'edit') {
             // Editar usuario
             $id = $_POST['id'];
@@ -26,30 +27,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $password = $_POST['contraseña'];
             $role = $_POST['rol'];
 
-            $stmt = $conn->prepare("UPDATE usuarios SET nombre_usuario = ?, contraseña = ?, rol = ? WHERE id = ?");
-            $stmt->bind_param("sssi", $username, $password, $role, $id);
+            $stmt = $conn->prepare("UPDATE usuarios SET nombre_usuario = :username, contraseña = :password, rol = :role WHERE id = :id");
+            $stmt->bindValue(':username', $username, PDO::PARAM_STR);
+            $stmt->bindValue(':password', $password, PDO::PARAM_STR);
+            $stmt->bindValue(':role', $role, PDO::PARAM_STR);
+            $stmt->bindValue(':id', $id, PDO::PARAM_INT);
             $stmt->execute();
-            $stmt->close();
         } elseif ($action === 'delete') {
             // Eliminar usuario
             $id = $_POST['id'];
 
-            $stmt = $conn->prepare("DELETE FROM usuarios WHERE id = ?");
-            $stmt->bind_param("i", $id);
+            $stmt = $conn->prepare("DELETE FROM usuarios WHERE id = :id");
+            $stmt->bindValue(':id', $id, PDO::PARAM_INT);
             $stmt->execute();
-            $stmt->close();
         }
     }
 }
-// Obtener todos los usuarios para mostrarlos
-$result = $conn->query("SELECT * FROM usuarios");
 
-// Inicializar el array para los usuarios
-$usuarios = [];
-while ($usuario = $result->fetch_assoc()) {
-    $usuarios[] = $usuario;
-}
-$result->close();
+// Obtener todos los usuarios para mostrarlos
+$stmt = $conn->query("SELECT * FROM usuarios");
+$usuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);  // Cambiado de fetch_all()
 ?>
 
 <!DOCTYPE html>
@@ -115,65 +112,21 @@ $result->close();
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($usuarios as $usuario): ?>
+                        <?php foreach ($usuarios as $usuario) : ?>
                             <tr>
-                                <td><?= $usuario['id'] ?></td>
-                                <td><?= htmlspecialchars($usuario['nombre_usuario']) ?></td>
-                                <td><?= htmlspecialchars($usuario['contraseña']) ?></td>
-                                <td><?= htmlspecialchars($usuario['rol']) ?></td>
+                                <td><?php echo $usuario['id']; ?></td>
+                                <td><?php echo $usuario['nombre_usuario']; ?></td>
+                                <td><?php echo $usuario['contraseña']; ?></td>
+                                <td><?php echo $usuario['rol']; ?></td>
                                 <td>
-                                    <!-- Formulario Editar -->
-                                    <form method="post" style="display:inline-block;">
-                                        <input type="hidden" name="action" value="edit">
-                                        <input type="hidden" name="id" value="<?= $usuario['id'] ?>">
-                                        <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editModal<?= $usuario['id'] ?>">Editar</button>
-                                    </form>
-
-                                    <!-- Formulario Eliminar -->
-                                    <form method="post" style="display:inline-block;">
+                                    <a href="editar_usuario.php?id=<?php echo $usuario['id']; ?>" class="btn btn-warning btn-sm">Editar</a>
+                                    <form action="crud.php" method="POST" class="d-inline">
                                         <input type="hidden" name="action" value="delete">
-                                        <input type="hidden" name="id" value="<?= $usuario['id'] ?>">
+                                        <input type="hidden" name="id" value="<?php echo $usuario['id']; ?>">
                                         <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
                                     </form>
                                 </td>
                             </tr>
-
-                            <!-- Modal Editar Usuario -->
-                            <div class="modal fade" id="editModal<?= $usuario['id'] ?>" tabindex="-1" aria-labelledby="editModalLabel<?= $usuario['id'] ?>" aria-hidden="true">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title" id="editModalLabel<?= $usuario['id'] ?>">Editar Usuario</h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <form method="post">
-                                                <input type="hidden" name="action" value="edit">
-                                                <input type="hidden" name="id" value="<?= $usuario['id'] ?>">
-                                                <div class="mb-3">
-                                                    <label for="nombre_usuario_<?= $usuario['id'] ?>" class="form-label">Nombre de Usuario</label>
-                                                    <input type="text" id="nombre_usuario_<?= $usuario['id'] ?>" name="nombre_usuario" class="form-control" value="<?= htmlspecialchars($usuario['nombre_usuario']) ?>" required>
-                                                </div>
-                                                <div class="mb-3">
-                                                    <label for="contraseña_<?= $usuario['id'] ?>" class="form-label">Contraseña</label>
-                                                    <input type="text" id="contraseña_<?= $usuario['id'] ?>" name="contraseña" class="form-control" value="<?= htmlspecialchars($usuario['contraseña']) ?>" required>
-                                                </div>
-                                                <div class="mb-3">
-                                                    <label for="rol_<?= $usuario['id'] ?>" class="form-label">Rol</label>
-                                                    <select id="rol_<?= $usuario['id'] ?>" name="rol" class="form-select" required>
-                                                        <option value="user" <?= $usuario['rol'] === 'user' ? 'selected' : '' ?>>Usuario</option>
-                                                        <option value="admin" <?= $usuario['rol'] === 'admin' ? 'selected' : '' ?>>Administrador</option>
-                                                    </select>
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                                    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                         <?php endforeach; ?>
                     </tbody>
                 </table>
@@ -182,8 +135,8 @@ $result->close();
     </div>
 
     <!-- Footer -->
-    <?php include 'partials/footer.html'; ?>
-
+    <?php include 'partials/footer.php'; ?>
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
