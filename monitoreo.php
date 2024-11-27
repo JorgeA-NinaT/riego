@@ -11,28 +11,22 @@ $registrosPorPagina = 25;
 $pagina = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
 $offset = ($pagina - 1) * $registrosPorPagina;
 
-// Consultar las tablas
-// Consulta de lecturas de sensores con paginación
-$queryLecturas = "SELECT * FROM lecturas ORDER BY fecha_hora DESC LIMIT $registrosPorPagina OFFSET $offset";
-$resultLecturas = $conn->query($queryLecturas);
+// Consultar las tablas con consultas preparadas
+$queryLecturas = "SELECT * FROM lecturas ORDER BY fecha_hora DESC LIMIT :limit OFFSET :offset";
+$stmtLecturas = $conn->prepare($queryLecturas);
+$stmtLecturas->bindParam(':limit', $registrosPorPagina, PDO::PARAM_INT);
+$stmtLecturas->bindParam(':offset', $offset, PDO::PARAM_INT);
+$stmtLecturas->execute();
+$lecturas = $stmtLecturas->fetchAll(PDO::FETCH_ASSOC);
 
-// Consulta del estado de la bomba con paginación
-$queryEstadoBomba = "SELECT * FROM estado_bomba ORDER BY fecha_hora DESC LIMIT $registrosPorPagina OFFSET $offset";
-$resultEstadoBomba = $conn->query($queryEstadoBomba);
-
-// Consulta de comandos pendientes con paginación
-$queryComandos = "SELECT * FROM comandos ORDER BY fecha_hora DESC LIMIT $registrosPorPagina OFFSET $offset";
-$resultComandos = $conn->query($queryComandos);
-
-// Obtener el número total de registros para paginación
-$totalLecturas = $conn->query("SELECT COUNT(*) AS total FROM lecturas")->fetch_assoc()['total'];
-$totalEstadoBomba = $conn->query("SELECT COUNT(*) AS total FROM estado_bomba")->fetch_assoc()['total'];
-$totalComandos = $conn->query("SELECT COUNT(*) AS total FROM comandos")->fetch_assoc()['total'];
+// Obtener el número total de registros
+$queryTotalLecturas = "SELECT COUNT(*) AS total FROM lecturas";
+$stmtTotalLecturas = $conn->prepare($queryTotalLecturas);
+$stmtTotalLecturas->execute();
+$totalLecturas = $stmtTotalLecturas->fetch(PDO::FETCH_ASSOC)['total'];
 
 // Calcular el número total de páginas
 $totalPaginasLecturas = ceil($totalLecturas / $registrosPorPagina);
-$totalPaginasEstadoBomba = ceil($totalEstadoBomba / $registrosPorPagina);
-$totalPaginasComandos = ceil($totalComandos / $registrosPorPagina);
 ?>
 
 <!DOCTYPE html>
