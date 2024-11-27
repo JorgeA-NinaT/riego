@@ -1,5 +1,5 @@
-echo {
-  \"require\": {
-    \"ext-pdo_pgsql\": \"*\"
+{
+  "require": {
+    "ext-pdo_pgsql": "*"
   }
-} > composer.json
+}
