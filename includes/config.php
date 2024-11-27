@@ -1,42 +1,35 @@
 <?php
-session_start();
+$DB_HOST = 'dpg-ct33nf3qf0us73a4m0jg-a.oregon-postgres.render.com';  // Cambia el host según el tuyo
+$DB_USER = 'riego_user';  // Tu nombre de usuario de la base de datos
+$DB_PASS = 'hPZGQbOwfxJeOKbSGQ9IfCl3weGSeTNI';  // Tu contraseña de la base de datos
+$DB_NAME = 'riego';  // El nombre de tu base de datos
 
-function login($username, $password) {
-    global $conn;
-    
-    // Cambiar la consulta para usar PostgreSQL
-    $stmt = $conn->prepare("SELECT id, nombre_usuario, contraseña, rol FROM usuarios WHERE nombre_usuario = ?");
-    $stmt->bindParam(1, $username, PDO::PARAM_STR);
-    $stmt->execute();
-    
-    // Verificar si existe el usuario
-    if ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-        // Simple comparación de contraseñas sin hash
-        if ($password === $row['contraseña']) {
-            $_SESSION['user_id'] = $row['id'];
-            $_SESSION['username'] = $row['nombre_usuario'];
-            $_SESSION['role'] = $row['rol'];
-            return true;
+try {
+    // Usamos PDO para conectar con PostgreSQL
+    $conn = new PDO("pgsql:host=$DB_HOST;dbname=$DB_NAME", $DB_USER, $DB_PASS);
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    die("Error al conectar a la base de datos: " . $e->getMessage());
+}
+
+// Verificar si el usuario quiere eliminar los registros de lecturas
+if (isset($_POST['eliminar_lecturas']) && $_POST['eliminar_lecturas'] == 'true') {
+    // Verificar que el usuario esté autenticado y tenga permisos
+    if (isset($_SESSION['usuario_id'])) {
+        // Ejecutar la consulta para eliminar todos los registros de la tabla 'lecturas'
+        $queryEliminar = "DELETE FROM lecturas";
+        try {
+            $stmt = $conn->prepare($queryEliminar);
+            $stmt->execute();
+            echo "<script>alert('Todos los registros de lecturas han sido eliminados.'); window.location.href = 'monitoreo.php';</script>";
+        } catch (PDOException $e) {
+            echo "<script>alert('Hubo un error al eliminar los registros.');</script>";
         }
-    }
-    return false;
-}
-
-function isLoggedIn() {
-    return isset($_SESSION['user_id']);
-}
-
-function requireLogin() {
-    if (!isLoggedIn()) {
+    } else {
+        // Si no está autenticado, redirigir a la página de login
         header("Location: login.php");
         exit();
     }
 }
-
-function requireAdmin() {
-    requireLogin();
-    if ($_SESSION['role'] !== 'admin') {
-        die("Access Denied");
-    }
-}
 ?>
+
