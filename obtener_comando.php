@@ -1,19 +1,23 @@
 <?php
-require_once 'includes/config.php';
+// Archivo que almacena el último comando enviado
+$comandoArchivo = 'comando.txt';
 
-try {
-    // Consultar el estado actual de la bomba usando PostgreSQL-specific syntax
-    $sql = "SELECT bomba_activa FROM lecturas ORDER BY id DESC LIMIT 1";
-    $stmt = $pdo->query($sql);
-    $result = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    if ($result !== false) {
-        // Devolver el estado como "ACTIVAR" o "DESACTIVAR"
-        echo ($result['bomba_activa'] == true) ? "ACTIVAR" : "DESACTIVAR";
+// Verifica si se ha recibido un comando y lo guarda en el archivo
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $comando = $_POST['comando'] ?? '';
+    if ($comando) {
+        file_put_contents($comandoArchivo, $comando);
+        echo 'Comando recibido: ' . $comando;
     } else {
-        echo "SIN_COMANDO"; // Si no hay registros
+        echo 'No se ha recibido un comando.';
     }
-} catch (PDOException $e) {
-    echo "ERROR: " . $e->getMessage();
+} else {
+    // Si no se ha enviado un comando, se lee el último comando desde el archivo
+    if (file_exists($comandoArchivo)) {
+        $comando = file_get_contents($comandoArchivo);
+        echo $comando;
+    } else {
+        echo 'No hay comando guardado.';
+    }
 }
 ?>
