@@ -1,7 +1,7 @@
 <?php
 // Incluir la librería FPDF
 require('fpdf186/fpdf.php');
-require_once 'includes/config.php';
+require_once 'includes/config.php'; // Este archivo debe contener la configuración de PostgreSQL
 
 // Capturar el tipo de reporte
 $tipo = isset($_GET['tipo']) ? $_GET['tipo'] : 'general';
@@ -19,28 +19,27 @@ if ($tipo === 'general') {
 } elseif ($tipo === 'bomba_activa') {
     $titulo = 'Reporte de Lecturas con Bomba Activa';
     $query = "WITH cambios_estado AS (
+        SELECT 
+            id, 
+            temperatura, 
+            humedad_suelo, 
+            bomba_activa, 
+            fecha_hora,
+            LAG(bomba_activa) OVER (ORDER BY fecha_hora ASC) AS estado_anterior
+        FROM 
+            lecturas
+    )
     SELECT 
         id, 
         temperatura, 
         humedad_suelo, 
-        bomba_activa, 
-        fecha_hora,
-        LAG(bomba_activa) OVER (ORDER BY fecha_hora ASC) AS estado_anterior
+        fecha_hora 
     FROM 
-        lecturas
-)
-SELECT 
-    id, 
-    temperatura, 
-    humedad_suelo, 
-    fecha_hora 
-FROM 
-    cambios_estado
-WHERE 
-    bomba_activa = 1 AND estado_anterior = 0
-ORDER BY 
-    fecha_hora ASC;
-";
+        cambios_estado
+    WHERE 
+        bomba_activa = 1 AND estado_anterior = 0
+    ORDER BY 
+        fecha_hora ASC;";
 } elseif ($tipo === 'promedio') {
     $titulo = 'Reporte de Promedios por Periodo';
     $fechaInicio = $_GET['fecha_inicio'];
@@ -49,7 +48,7 @@ ORDER BY
         SELECT 
             AVG(temperatura) AS promedio_temperatura, 
             AVG(humedad_suelo) AS promedio_humedad, 
-            DATE_FORMAT(fecha_hora, '%Y-%m-%d %H:00:00') AS periodo
+            TO_CHAR(fecha_hora, 'YYYY-MM-DD HH24:00:00') AS periodo
         FROM lecturas
         WHERE fecha_hora BETWEEN '$fechaInicio' AND '$fechaFin'
         GROUP BY periodo
@@ -80,12 +79,20 @@ if ($tipo === 'promedio') {
 }
 $pdf->Ln();
 
+// Conectar a la base de datos PostgreSQL
+$conn = pg_connect("host=dpg-ct33nf3qf0us73a4m0jg-a dbname=riego user=riego_user password=hPZGQbOwfxJeOKbSGQ9IfCl3weGSeTN");
+
+
+if (!$conn) {
+    die("Error de conexión a la base de datos");
+}
+
 // Ejecutar la consulta y llenar los datos
-$result = $conn->query($query);
+$result = pg_query($conn, $query);
 $pdf->SetFont('Arial', '', 12);
 
-if ($result && $result->num_rows > 0) {
-    while ($row = $result->fetch_assoc()) {
+if ($result) {
+    while ($row = pg_fetch_assoc($result)) {
         if ($tipo === 'promedio') {
             $pdf->Cell(70, 10, $row['periodo'], 1);
             $pdf->Cell(60, 10, number_format($row['promedio_temperatura'], 2) . ' Centigrados', 1);
@@ -105,7 +112,9 @@ if ($result && $result->num_rows > 0) {
     $pdf->Cell(0, 10, 'No hay datos disponibles.', 1, 1, 'C');
 }
 
+// Cerrar la conexión
+pg_close($conn);
+
 // Generar y mostrar el PDF
 $pdf->Output();
-
 ?>
