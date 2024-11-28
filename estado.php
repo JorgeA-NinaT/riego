@@ -1,7 +1,51 @@
 <?php
 require_once 'includes/config.php';
 require_once 'includes/auth.php';
+
+// Ensure only authenticated users can access
 requireLogin();
+
+// File to store the current command
+$command_file = 'data/current_command.txt';
+
+// Ensure data directory exists
+if (!file_exists('data')) {
+    mkdir('data', 0755, true);
+}
+
+// Handle different HTTP methods
+if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+    // When ESP32 requests the current command
+    if (file_exists($command_file)) {
+        $current_command = trim(file_get_contents($command_file));
+        echo $current_command;
+        
+        // Reset command after reading to prevent repeated execution
+        file_put_contents($command_file, '');
+    } else {
+        echo '';  // No command
+    }
+    exit;
+} elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // When dashboard sends a new command
+    if (isset($_POST['comando'])) {
+        $comando = $_POST['comando'];
+        
+        // Validate command
+        if (in_array($comando, ['ACTIVAR', 'DESACTIVAR'])) {
+            // Store command in file for ESP32 to read
+            file_put_contents($command_file, $comando);
+            echo 'Comando guardado: ' . $comando;
+        } else {
+            http_response_code(400);
+            echo 'Comando inválido';
+        }
+    } else {
+        http_response_code(400);
+        echo 'No se proporcionó comando';
+    }
+    exit;
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -110,7 +154,7 @@ requireLogin();
 
 <script>
     function enviarComando(comando) {
-        fetch('obtener_comando.php', {
+        fetch('estado.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',

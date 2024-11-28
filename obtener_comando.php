@@ -2,17 +2,16 @@
 require_once 'includes/config.php';
 
 try {
-    // Consultar el estado más reciente de la bomba
+    // Consultar el estado actual de la bomba
     $sql = "SELECT bomba_activa FROM lecturas ORDER BY id DESC LIMIT 1";
     $stmt = $pdo->query($sql);
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if ($result) {
-        // Determinar el comando basado en el estado de la bomba
-        $comando = $result['bomba_activa'] ? "ACTIVAR" : "DESACTIVAR";
-        echo $comando;
+    if ($result !== false) {
+        // Devolver el estado como "ACTIVAR" o "DESACTIVAR"
+        echo ($result['bomba_activa'] == 1) ? "ACTIVAR" : "DESACTIVAR";
     } else {
-        echo "SIN_COMANDO"; // En caso de no encontrar registros
+        echo "SIN_COMANDO"; // Si no hay registros
     }
 } catch (PDOException $e) {
     echo "ERROR: " . $e->getMessage();
