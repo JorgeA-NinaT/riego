@@ -115,21 +115,32 @@ requireLogin();
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
             },
-            body: 'comando=' + comando
+            body: 'comando=' + encodeURIComponent(comando)
         })
-        .then(response => response.text())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error en la solicitud');
+            }
+            return response.text();
+        })
         .then(data => {
             alert('Comando ' + comando + ' enviado');
             actualizarEstado();
         })
         .catch(error => {
             console.error('Error:', error);
+            alert('Ocurrió un error al enviar el comando');
         });
     }
 
     function actualizarEstado() {
         fetch('get_latest_data.php')
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error al obtener datos');
+                }
+                return response.json();
+            })
             .then(data => {
                 const estadoBomba = document.getElementById('estado-bomba');
                 const circleProgress = document.getElementById('circle-progress');
@@ -148,6 +159,9 @@ requireLogin();
             })
             .catch(error => {
                 console.error('Error al obtener el estado:', error);
+                const estadoBomba = document.getElementById('estado-bomba');
+                estadoBomba.textContent = 'Error al cargar estado';
+                estadoBomba.style.color = '#dc3545';
             });
     }
 
@@ -159,13 +173,19 @@ requireLogin();
             },
             body: 'manual=true'
         })
-        .then(response => response.text())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error en la solicitud');
+            }
+            return response.text();
+        })
         .then(data => {
             alert('Bomba activada manualmente');
             actualizarEstado();
         })
         .catch(error => {
             console.error('Error:', error);
+            alert('Ocurrió un error al activar la bomba');
         });
     }
 
