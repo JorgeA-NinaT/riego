@@ -1,53 +1,7 @@
 <?php
 require_once 'includes/config.php';
 require_once 'includes/auth.php';
-
-// Ensure only authenticated users can access
 requireLogin();
-
-// File to store the current command
-$command_file = 'data/current_command.txt';
-
-// Ensure data directory exists
-if (!file_exists('data')) {
-    mkdir('data', 0755, true);
-}
-
-// Handle different HTTP methods
-if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    // When ESP32 requests the current command
-    if (file_exists($command_file)) {
-        $current_command = trim(file_get_contents($command_file));
-        echo $current_command;
-        
-        // Reset command after reading to prevent repeated execution
-        file_put_contents($command_file, '');
-        exit;
-    } else {
-        echo '';  // No command
-        exit;
-    }
-} elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // When dashboard sends a new command
-    if (isset($_POST['comando'])) {
-        $comando = $_POST['comando'];
-        
-        // Validate command
-        if (in_array($comando, ['ACTIVAR', 'DESACTIVAR'])) {
-            // Store command in file for ESP32 to read
-            file_put_contents($command_file, $comando);
-            echo 'Comando guardado: ' . $comando;
-        } else {
-            http_response_code(400);
-            echo 'Comando inválido';
-        }
-        exit;
-    } else {
-        http_response_code(400);
-        echo 'No se proporcionó comando';
-        exit;
-    }
-}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -61,7 +15,62 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <link rel="stylesheet" href="css/styles.css">
     <style>
-        /* Estilos anteriores se mantienen igual */
+        /* Círculo de progreso */
+        .progress-circle {
+            width: 120px;
+            height: 120px;
+            background: conic-gradient(#28a745 0% 50%, #dc3545 50% 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            font-weight: bold;
+            color: white;
+            margin: 0 auto;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .main-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 80vh;
+        }
+
+        .control-container {
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .botones-control button {
+            width: 100%;
+            margin: 10px 0;
+        }
+
+        /* Estilo del encabezado */
+        .h1-container {
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 767px) {
+            .progress-circle {
+                width: 100px;
+                height: 100px;
+                font-size: 18px;
+            }
+
+            .control-container {
+                padding: 15px;
+            }
+
+            .botones-control button {
+                font-size: 14px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -99,10 +108,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     </div>
 </div>
 
-
-    <script>
+<script>
     function enviarComando(comando) {
-        fetch('estado.php', {
+        fetch('obtener_comando.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -164,9 +172,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     setInterval(actualizarEstado, 5000);
     actualizarEstado();
 </script>
-
 <?php include 'partials/footer.html'; ?>
 </body>
 </html>
-
-
