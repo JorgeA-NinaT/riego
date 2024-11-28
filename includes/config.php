@@ -11,25 +11,4 @@ try {
 } catch (PDOException $e) {
     die("Error al conectar a la base de datos: " . $e->getMessage());
 }
-
-// Verificar si el usuario quiere eliminar los registros de lecturas
-var_dump($_POST);  // Para ver si se está enviando correctamente el valor
-if (isset($_POST['eliminar_lecturas']) && $_POST['eliminar_lecturas'] == 'true') {
-    // Verificar que el usuario esté autenticado y tenga permisos
-    if (isset($_SESSION['usuario_id'])) {
-        // Ejecutar la consulta para eliminar todos los registros de la tabla 'lecturas'
-        $queryEliminar = "DELETE FROM lecturas";
-        try {
-            $stmt = $conn->prepare($queryEliminar);
-            $stmt->execute();
-            echo "<script>alert('Todos los registros de lecturas han sido eliminados.'); window.location.href = 'monitoreo.php';</script>";
-        } catch (PDOException $e) {
-            echo "<script>alert('Hubo un error al eliminar los registros.');</script>";
-        }
-    } else {
-        // Si no está autenticado, redirigir a la página de login
-        header("Location: login.php");
-        exit();
-    }
-}
 ?>
