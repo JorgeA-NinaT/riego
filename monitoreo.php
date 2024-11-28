@@ -133,7 +133,7 @@ $totalPaginasLecturas = ceil($totalLecturas / $registrosPorPagina);
             <button class="btn btn-info btn-custom" onclick="generarReporte('general');">Reporte General</button>
             <button class="btn btn-warning btn-custom" onclick="generarReporte('bomba_activa');">Reporte Bombas Activas</button>
 
-            <form class="d-inline-block mt-2" action="monitoreo.php" method="POST">
+            <form class="d-inline-block mt-2" action="eliminar_registros.php" method="POST">
                 <input type="hidden" name="eliminar_lecturas" value="true">
                 <button type="submit" name="eliminar" onclick="return confirm('¿Estás seguro de eliminar todos los registros?')">Eliminar Todos los Registros</button>
                 </button>
