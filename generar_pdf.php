@@ -1,7 +1,7 @@
 <?php
 // Incluir la librería FPDF
 require('fpdf186/fpdf.php');
-require_once 'includes/config.php';
+require_once 'includes/config.php'; // Asegúrate de que esta línea está correcta y carga el archivo de configuración
 
 // Capturar el tipo de reporte
 $tipo = isset($_GET['tipo']) ? $_GET['tipo'] : 'general';
@@ -81,7 +81,7 @@ try {
     $pdf->Ln();
 
     // Preparar y ejecutar la consulta
-    $stmt = $pdo->prepare($query);
+    $stmt = $conn->prepare($query); // Cambié $pdo a $conn
 
     // Bind parameters para consulta de promedio
     if ($tipo === 'promedio') {

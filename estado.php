@@ -109,6 +109,7 @@ requireLogin();
 </div>
 
 <script>
+    // Función para enviar el comando al ESP32
     function enviarComando(comando) {
         fetch('obtener_comando.php', {
             method: 'POST',
@@ -133,6 +134,7 @@ requireLogin();
         });
     }
 
+    // Función para actualizar el estado de la bomba
     function actualizarEstado() {
         fetch('get_latest_data.php')
             .then(response => {
@@ -165,6 +167,7 @@ requireLogin();
             });
     }
 
+    // Función para activar manualmente la bomba
     function activarManual() {
         fetch('activar_manual.php', {
             method: 'POST',
@@ -189,6 +192,7 @@ requireLogin();
         });
     }
 
+    // Actualizar el estado cada 5 segundos
     setInterval(actualizarEstado, 5000);
     actualizarEstado();
 </script>
