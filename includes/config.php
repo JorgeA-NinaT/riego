@@ -13,6 +13,7 @@ try {
 }
 
 // Verificar si el usuario quiere eliminar los registros de lecturas
+var_dump($_POST);  // Para ver si se está enviando correctamente el valor
 if (isset($_POST['eliminar_lecturas']) && $_POST['eliminar_lecturas'] == 'true') {
     // Verificar que el usuario esté autenticado y tenga permisos
     if (isset($_SESSION['usuario_id'])) {

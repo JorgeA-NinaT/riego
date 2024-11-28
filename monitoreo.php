@@ -135,11 +135,12 @@ $totalPaginasLecturas = ceil($totalLecturas / $registrosPorPagina);
 
             <form class="d-inline-block mt-2" action="monitoreo.php" method="POST">
                 <input type="hidden" name="eliminar_lecturas" value="true">
-                <button type="submit" class="btn btn-danger btn-custom" 
-                        onclick="return confirm('¿Estás seguro de eliminar todos los registros de lecturas?')">
+                <button type="submit" class="btn btn-danger btn-custom">
                     Eliminar Todos los Registros
                 </button>
             </form>
+
+            
         </div>
     </div>
 
