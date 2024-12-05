@@ -12,7 +12,12 @@ $pagina = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
 $offset = ($pagina - 1) * $registrosPorPagina;
 
 // Consultar las tablas con consultas preparadas
-$queryLecturas = "SELECT * FROM lecturas ORDER BY fecha_hora DESC LIMIT :limit OFFSET :offset";
+$queryLecturas = "SELECT 
+    *, 
+    date_trunc('second', fecha_hora) as fecha_hora_sin_decimales 
+FROM lecturas 
+ORDER BY fecha_hora DESC 
+LIMIT :limit OFFSET :offset";
 $stmtLecturas = $conn->prepare($queryLecturas);
 $stmtLecturas->bindParam(':limit', $registrosPorPagina, PDO::PARAM_INT);
 $stmtLecturas->bindParam(':offset', $offset, PDO::PARAM_INT);

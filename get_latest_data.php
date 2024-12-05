@@ -18,6 +18,6 @@ echo json_encode([
     'temperatura' => round($data['temperatura'], 1),
     'humedad_suelo' => round($data['humedad_suelo'], 1),
     'bomba_activa' => (bool) $data['bomba_activa'],  // Convertir a booleano
-    'timestamp' => date('Y-m-d H:i:s', strtotime($data['fecha_hora']))
+    'timestamp' => $data['fecha_hora']
 ]);
 ?>
