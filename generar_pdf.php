@@ -112,7 +112,7 @@ try {
                 if ($tipo !== 'bomba_activa') {
                     $pdf->Cell(35, 10, $row['bomba_activa'] ? 'Si' : 'No', 1);
                 }
-                $pdf->Cell(50, 10, date('Y-m-d H:i', strtotime($row['fecha_hora'])), 1);
+                $pdf->Cell(50, 10, date('Y-m-d H:i:s', strtotime($row['fecha_hora'])), 1);
             }
             $pdf->Ln();
         }
