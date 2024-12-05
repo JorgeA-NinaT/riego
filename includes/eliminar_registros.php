@@ -8,7 +8,7 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
 }
 
 // Incluir la configuración de la base de datos
-include 'includes/config.php'; // Asegúrate de que config.php tenga la conexión correcta
+include 'config.php'; // Asegúrate de que config.php tenga la conexión correcta
 
 // Verificar si se presionó el botón para eliminar los registros
 if (isset($_POST['eliminar'])) {
