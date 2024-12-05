@@ -100,8 +100,11 @@ try {
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             if ($tipo === 'promedio') {
                 $pdf->Cell(70, 10, $row['periodo'], 1);
-                $pdf->Cell(60, 10, number_format($row['promedio_temperatura'], 2) . ' Centigrados', 1);
-                $pdf->Cell(60, 10, number_format($row['promedio_humedad'], 2) . ' %', 1);
+                $temp = is_numeric($row['promedio_temperatura']) ? number_format($row['promedio_temperatura'], 2) : '0.00';
+                $humedad = is_numeric($row['promedio_humedad']) ? number_format($row['promedio_humedad'], 2) : '0.00';
+                
+                $pdf->Cell(60, 10, $temp . ' Centigrados', 1);
+                $pdf->Cell(60, 10, $humedad . ' %', 1);
             } else {
                 $pdf->Cell(30, 10, $row['id'], 1);
                 $pdf->Cell(35, 10, $row['temperatura'] . ' Centigrados', 1);
