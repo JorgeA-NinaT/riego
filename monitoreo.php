@@ -85,7 +85,7 @@ $totalPaginasLecturas = ceil($totalLecturas / $registrosPorPagina);
                                 <td><?= htmlspecialchars($row['temperatura']) ?> °C</td>
                                 <td><?= htmlspecialchars($row['humedad_suelo']) ?>%</td>
                                 <td><?= $row['bomba_activa'] ? 'Sí' : 'No' ?></td>
-                                <td><?= htmlspecialchars($row['fecha_hora']) ?></td>
+                                <td><?= htmlspecialchars($row['fecha_hora_sin_decimales']) ?></td>
                             </tr>
                         <?php endforeach; ?>
                     <?php else: ?>
