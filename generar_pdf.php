@@ -48,8 +48,8 @@ try {
         $query = "
             SELECT 
                 DATE_TRUNC('hour', fecha_hora) AS periodo,
-                AVG(temperatura) AS promedio_temperatura, 
-                AVG(humedad_suelo) AS promedio_humedad
+                COALESCE(AVG(temperatura), 0) AS promedio_temperatura, 
+                COALESCE(AVG(humedad_suelo), 0) AS promedio_humedad
             FROM lecturas
             WHERE fecha_hora BETWEEN :fecha_inicio AND :fecha_fin
             GROUP BY periodo
