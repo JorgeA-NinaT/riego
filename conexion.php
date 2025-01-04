@@ -2,7 +2,7 @@
 $host = 'dpg-ctqvhrrqf0us73fgp3mg-a';
 $dbname = 'dbriego';
 $user = 'dbriego_user';
-$password = 'dpg-ctqvhrrqf0us73fgp3mg-a';
+$password = '4W5SBYfNgao6E2vKqtiMirHRGSxT2YCS';
 
 try {
     // Conexión con PDO para PostgreSQL
