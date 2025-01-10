@@ -3,7 +3,8 @@
 include 'conexion.php';
 
 // Obtener los valores enviados por POST
-$temperatura = $_POST['temperatura'];
+// Obtener los valores enviados por POST
+$temperatura = isset($_POST['temperatura']) ? $_POST['temperatura'] : 0;
 $humedad_suelo = $_POST['humedad_suelo'];
 $bomba_activa = $_POST['bomba_activa'];
 
