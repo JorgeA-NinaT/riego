@@ -3,11 +3,15 @@
 include 'conexion.php';
 
 // Obtener los valores enviados por POST
-// Obtener los valores enviados por POST
 $temperatura = isset($_POST['temperatura']) ? $_POST['temperatura'] : 0;
 $humedad_suelo = $_POST['humedad_suelo'];
 $bomba_activa = $_POST['bomba_activa'];
 
+// Verificar si el valor de temperatura es válido, de lo contrario asignar 0
+if (!is_numeric($temperatura) || $temperatura < -50 || $temperatura > 100) { 
+        // Rango de temperatura ajustado a valores razonables; cámbialo según tus necesidades
+        $temperatura = 0;
+}
 // Preparar la consulta SQL para insertar los datos en la tabla 'lecturas'
 $sql = "INSERT INTO lecturas (temperatura, humedad_suelo, bomba_activa) 
         VALUES (:temperatura, :humedad_suelo, :bomba_activa)";
