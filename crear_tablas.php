@@ -1,9 +1,9 @@
 <?php
 // Conexión a la base de datos PostgreSQL
-$host = 'dpg-ctqvhrrqf0us73fgp3mg-a';
-$dbname = 'dbriego';
-$user = 'dbriego_user';
-$password = '4W5SBYfNgao6E2vKqtiMirHRGSxT2YCS';
+$host = 'dpg-cum9pelumphs738fb720-a';
+$dbname = 'riego_s6ej';
+$user = 'riego_s6ej_user';
+$password = '3VOWAFCIY4VulC6nHSkJo2bUpulNGhMW';
 $port = "5432";
 
 try {
