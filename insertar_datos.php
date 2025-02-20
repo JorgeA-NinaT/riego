@@ -36,7 +36,7 @@ try {
             $humedad_suelo = max(0, min(100, $base_humedad + $variacion_humedad + rand(-10, 10)));
 
             // Bomba activa cuando la humedad es baja
-            $bomba_activa = ($humedad_suelo < 40) ? true : false;
+            $bomba_activa = ($humedad_suelo < 40) ? 'true' : 'false';
 
             // Insertar el registro
             $stmt->execute([
